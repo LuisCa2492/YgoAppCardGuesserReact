@@ -8,7 +8,7 @@ export const NavBar = () => {
                 className="navbar-brand" 
                 to="/"
             >
-                Asociaciones
+                YGO Card Guesser
             </Link>
 
             <div className="navbar-collapse">
@@ -45,7 +45,7 @@ export const NavBar = () => {
                       className='nav-item nav-link btn'
                       
                     >
-                        Logout
+                        Luis Miranda C.
                     </button>
                 </ul>
             </div>

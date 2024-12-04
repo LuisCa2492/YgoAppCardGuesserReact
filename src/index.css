@@ -1,5 +1,5 @@
 .list-group-item:hover, .dropdown-item:hover{
-    background-color: green; /* Cambia el color de fondo a verde */
+    background-color: rgb(182, 5, 5); /* Cambia el color de fondo a verde */
     color: white;            /* Cambia el texto a blanco */
     transition: background-color 0.3s; /* Suaviza la transición */
 }

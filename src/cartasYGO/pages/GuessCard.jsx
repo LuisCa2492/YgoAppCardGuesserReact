@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from '../../hooks/useForm';
 import 'animate.css';
 import '../../index.css';
+import { Autocomplete, TextField } from '@mui/material';
 
 
 export const GuessCard = () => {
@@ -32,6 +33,7 @@ export const GuessCard = () => {
             setCartasBuscadas([]);
             setSuggestions([]);
             setCorrectGuess(false);
+            //onResetForm();
         }
     },[correctGuess])
 
@@ -52,11 +54,18 @@ export const GuessCard = () => {
             }else{
                 alert('Wrong!','','error');
             }
-
-        }else{
-            setCorrectGuess(true);
-            alert('Wrong!',`the card was: <b>${carta.name}</b>`,'error',6000);
+            
+            
+        }else {
+            if(carta.name === name){
+                setCorrectGuess(true);
+                alert('Correct!','','success');
+            }else{
+                setCorrectGuess(true);
+                alert('Wrong!',`the card was: <b>${carta.name}</b>`,'error',6000);
+            }
         }
+      
     }
 
     const SiguienteCarta = () => {
@@ -71,7 +80,7 @@ export const GuessCard = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
         setDebouncedSearchText(searchText); // Actualiza después de 500ms
-        }, 500);
+        }, 1000);
 
         return () => clearTimeout(timer); // Limpia el timeout si el usuario sigue escribiendo
     }, [searchText]);
@@ -79,7 +88,7 @@ export const GuessCard = () => {
     // Llama al método de búsqueda cuando el valor final cambia
     useEffect(() => {
         if (debouncedSearchText.trim() !== "") {
-            handleSearch(debouncedSearchText);
+            validateSearch();
         }
     }, [debouncedSearchText]);
   
@@ -87,6 +96,11 @@ export const GuessCard = () => {
         agregarCartaBuscada(suggestion.name);
         guessTheCard(suggestion.name);
     };
+
+    const validateSearch = () =>{
+        const alreadySearched = cartasBuscadas.filter( busqueda => busqueda.trim().toLowerCase === searchText.trim().toLowerCase);
+        if(alreadySearched != [])handleSearch(debouncedSearchText);
+    }
   
     const agregarCartaBuscada = (name) => {
         if(cartasBuscadas.find(c => c === name))return;
@@ -108,23 +122,39 @@ export const GuessCard = () => {
       <>
         <div className="row">
         <div className="col-3">
-            <form onSubmit={searchTerm}>
-                <input 
-                    type='text'
-                    placeholder='Carta a buscar'
-                    className='form-control m-2'
-                    autoComplete='off'
-                    name='searchText'
+            <form onSubmit={searchTerm} className='m-2'>
+                <Autocomplete
+                    freeSolo
+                    options={suggestions.map(option => option.name)}  // Solo mostrar el nombre de la carta
                     value={searchText}
-                    onChange={onInputChange}
-                    ref={inputSearchRef}
-                    >
-                </input>
-                <button className='btn btn-primary m-2 form-control'>Buscar</button>
+                    onInputChange={(event, newInputValue) => {
+                        onInputChange({ target: { name: 'searchText', value: newInputValue } });
+                    }}
+                    onChange={(event, newValue) => {
+                        if (newValue) {
+                            onSuggestionClick({ name: newValue });
+                        }
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            
+                            placeholder="Escribe el nombre de la carta"
+                            variant="outlined"
+                            fullWidth
+                            inputRef={inputSearchRef}
+                            onFocus={() => {
+                                // elimino las sugerencias guardadas al dar click al valor de busqueda anterior para que no me devuelva la ultima busqueda
+                                setSuggestions([]);
+                            }}
+                        />
+                    )}
+                />
+                {/* <button className='btn btn-primary m-2 form-control'>Buscar</button> */}
             </form>
 
             {/* Dropdown de Sugerencias */}
-            {suggestions.length > 0 && (           
+            {/* {suggestions.length > 0 && (           
                     <div className="dropdown">
                         <button
                         className="btn btn-secondary dropdown-toggle w-100"
@@ -153,9 +183,9 @@ export const GuessCard = () => {
                         ))}
                         </ul>
                     </div>            
-            )}
+            )} */}
 
-            <ul className='list-group'>
+            <ul className='list-group m-2'>
                 {
                     (cartasBuscadas.map( busqueda =>
                         <li 
