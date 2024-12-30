@@ -7,6 +7,10 @@ import { CardBySimilarName } from '../components/CardBySimilarName';
 import queryString from 'query-string';
 import { useEffect } from 'react';
 
+const formData ={
+    searchText: name
+}
+
 export const SearchByPartialName = () => {
 
   const {cartas} = useSelector(state => state.yugioh);
@@ -14,9 +18,7 @@ export const SearchByPartialName = () => {
   const location = useLocation();
   const {name=''} = queryString.parse(location.search);
 
-  const {searchText,onInputChange} = useForm({
-      searchText: name
-  });
+  const {searchText,onInputChange,onResetForm} = useForm(formData);
 
   useEffect(() => {
     searchTerm(event);
@@ -29,10 +31,8 @@ export const SearchByPartialName = () => {
         event.preventDefault();
         navigate(`?name=${searchText}`);
         if(searchText.trim().length <=1) return;
-        
         dispatch(searchByCoincidence(searchText.trim().toLowerCase()));
-        console.log(JSON.stringify(cartas.data,null,2));
-        //console.log(cartas);
+        onResetForm();
   }
 
 

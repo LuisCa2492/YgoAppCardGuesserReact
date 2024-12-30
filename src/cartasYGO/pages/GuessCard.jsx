@@ -8,6 +8,7 @@ import 'animate.css';
 import '../../index.css';
 import { Autocomplete, TextField } from '@mui/material';
 
+const formData= { searchText: '' };
 
 export const GuessCard = () => {
     const {carta,cartas} = useSelector( state => state.yugioh);
@@ -47,6 +48,7 @@ export const GuessCard = () => {
     }, [cartas])
     
     const guessTheCard = (name='') => {
+       // onResetForm();
         if(cartasBuscadas.length < 2){
             if(carta.name === name){
                 setCorrectGuess(true);
@@ -65,28 +67,27 @@ export const GuessCard = () => {
                 alert('Wrong!',`the card was: <b>${carta.name}</b>`,'error',6000);
             }
         }
-      
+       
     }
 
     const SiguienteCarta = () => {
         dispatch(getRandomCard());
     }
   
-    const {searchText,onInputChange,onResetForm} = useForm({
-        searchText: ''
-    });
+    const {searchText,onInputChange,onResetForm,formState} = useForm(formData);
 
      // Lógica de debounce
-    useEffect(() => {
-        const timer = setTimeout(() => {
-        setDebouncedSearchText(searchText); // Actualiza después de 500ms
-        }, 1000);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //     setDebouncedSearchText(searchText); // Actualiza después de 500ms
+    //     }, 1000);
 
-        return () => clearTimeout(timer); // Limpia el timeout si el usuario sigue escribiendo
-    }, [searchText]);
+    //     return () => clearTimeout(timer); // Limpia el timeout si el usuario sigue escribiendo
+    // }, [searchText]);
 
     // Llama al método de búsqueda cuando el valor final cambia
     useEffect(() => {
+        console.log('seat' + searchText)
         if (debouncedSearchText.trim() !== "") {
             validateSearch();
         }
@@ -99,7 +100,8 @@ export const GuessCard = () => {
 
     const validateSearch = () =>{
         const alreadySearched = cartasBuscadas.filter( busqueda => busqueda.trim().toLowerCase === searchText.trim().toLowerCase);
-        if(alreadySearched != [])handleSearch(debouncedSearchText);
+        //if(alreadySearched != [])handleSearch(debouncedSearchText);
+        if(alreadySearched != [])handleSearch(searchText);
     }
   
     const agregarCartaBuscada = (name) => {
@@ -111,12 +113,30 @@ export const GuessCard = () => {
         if (searchText.trim().length <= 1) return;
         dispatch(searchByCoincidence(searchText.trim().toLowerCase()));
         onResetForm();
+        console.log('handleSearch ' + searchText);
+        console.log('handleSearch2 ' + JSON.stringify(formState));
     };
 
     const searchTerm = (event) => {
           event.preventDefault(); // Solo intenta prevenir el comportamiento predeterminado si `event` existe
+          console.log('stext ' + searchText);
+          validateSearch();
           handleSearch();
     }
+
+
+    const [selectedValue, setSelectedValue] = useState('');
+    useEffect(() => {
+        if (selectedValue) {
+            // Procesa la opción seleccionada
+            onSuggestionClick({ name: selectedValue });
+    
+            // Limpia el valor seleccionado y el campo de texto después de procesar
+            setSelectedValue('');
+            onInputChange({ target: { name: 'searchText', value: '' } });
+        }
+    }, [selectedValue]);
+
 
     return (
       <>
@@ -132,7 +152,12 @@ export const GuessCard = () => {
                     }}
                     onChange={(event, newValue) => {
                         if (newValue) {
-                            onSuggestionClick({ name: newValue });
+                            setSelectedValue(newValue);
+                            // onSuggestionClick({ name: newValue });
+                            // setTimeout(() => {
+                            //     onInputChange({ target: { name: 'searchText', value: '' } }); // Limpia el valor después de un ciclo de renderizado
+                            // }, 0);
+                            
                         }
                     }}
                     renderInput={(params) => (

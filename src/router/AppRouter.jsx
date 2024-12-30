@@ -2,12 +2,29 @@ import React from 'react'
 import { Route, Router, Routes } from 'react-router-dom'
 import { YugiohApp } from '../yugiohApp'
 import { CartasRouter } from '../cartasYGO/routes/CartasRouter'
+import { useCheckAuth } from '../hooks/useCheckAuth'
+import { CheckingAuth } from '../ui/CheckingAuth'
+import { AuthRoutes } from '../auth/routes/AuthRoutes'
+import { NavBar } from '../ui/NavBar'
 
 export const AppRouter = () => {
+
+  const { status } = useCheckAuth();
+  console.log('status '+status)
+  if( status === 'checking'){
+
+    return <CheckingAuth/>;
+  } 
   return (
     <>
+    
         <Routes>
-            <Route path='/*' element={<CartasRouter/>}/>
+          {
+            (status === 'authenticated') ? <Route path='/*' element={<CartasRouter/>}/>
+            : <Route path='/*' element={<AuthRoutes/>}/>
+          }
+          
+            
             
         </Routes>
     </>
