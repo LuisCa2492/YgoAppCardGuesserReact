@@ -32,13 +32,10 @@ export const useForm = ( initialForm = {},formValidations = {} ) => {
 
     useEffect(() => {
         createValidators();
-        //console.log('if3 ' + JSON.stringify(formState));
-
     }, [formState])
 
     useEffect(() => {
         setFormState(initialForm);
-        //console.log('if2 ' + JSON.stringify(initialForm));
     }, [initialForm])
 
     const isFormValid = useMemo( () => {
@@ -50,17 +47,14 @@ export const useForm = ( initialForm = {},formValidations = {} ) => {
 
     const onInputChange = ({ target }) => {
         const { name, value } = target;
-        //console.log('onInputChange ' + JSON.stringify(target));
         onResetForm();
         setFormState({
             ...formState,
             [ name ]: value
         });
-        //console.log('onInputChange2 ' + JSON.stringify(formState));
     }
 
     const onResetForm = () => {
-        //console.log('if ' + JSON.stringify(initialForm));
         setFormState( initialForm );
     }
 

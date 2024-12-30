@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {alert} from '../helpers';
+import {alert, updateScore} from '../helpers';
 import { CardGuess } from '../components/CardGuess';
-import { getRandomCard,searchByCoincidence } from '../../store/slices/yugioh';
+import { getRandomCard,searchByCoincidence, setActualScore } from '../../store/slices/yugioh';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from '../../hooks/useForm';
 import 'animate.css';
@@ -11,7 +11,7 @@ import { Autocomplete, TextField } from '@mui/material';
 const formData= { searchText: '' };
 
 export const GuessCard = () => {
-    const {carta,cartas} = useSelector( state => state.yugioh);
+    const {carta,cartas,actualScore,totalScore,notGuessedNumber} = useSelector( state => state.yugioh);
     const dispatch = useDispatch();
     //Sugerencias
     const [suggestions,setSuggestions] = useState([]);
@@ -34,7 +34,6 @@ export const GuessCard = () => {
             setCartasBuscadas([]);
             setSuggestions([]);
             setCorrectGuess(false);
-            //onResetForm();
         }
     },[correctGuess])
 
@@ -46,12 +45,20 @@ export const GuessCard = () => {
         const result = cartas?.data?.length > 0 ? [...cartas.data] : [];
         setSuggestions(result);
     }, [cartas])
-    
+
+    //funcionalidad de puntaje del juego
+    // 3 intentos al primer intento 10pts, segundo 5pts, tercero 3 pts
+    const setScore = (guessesAmount) => {
+        dispatch(setActualScore(updateScore(guessesAmount)));
+    }
+
+    //fin
     const guessTheCard = (name='') => {
-       // onResetForm();
+        console.log('cartas buscadas' + cartasBuscadas.length);
         if(cartasBuscadas.length < 2){
             if(carta.name === name){
                 setCorrectGuess(true);
+                setScore(cartasBuscadas.length);
                 alert('Correct!','','success');
             }else{
                 alert('Wrong!','','error');
@@ -61,9 +68,11 @@ export const GuessCard = () => {
         }else {
             if(carta.name === name){
                 setCorrectGuess(true);
+                setScore(cartasBuscadas.length);
                 alert('Correct!','','success');
             }else{
                 setCorrectGuess(true);
+                setScore(notGuessedNumber);
                 alert('Wrong!',`the card was: <b>${carta.name}</b>`,'error',6000);
             }
         }
@@ -87,7 +96,6 @@ export const GuessCard = () => {
 
     // Llama al método de búsqueda cuando el valor final cambia
     useEffect(() => {
-        console.log('seat' + searchText)
         if (debouncedSearchText.trim() !== "") {
             validateSearch();
         }
@@ -113,13 +121,10 @@ export const GuessCard = () => {
         if (searchText.trim().length <= 1) return;
         dispatch(searchByCoincidence(searchText.trim().toLowerCase()));
         onResetForm();
-        console.log('handleSearch ' + searchText);
-        console.log('handleSearch2 ' + JSON.stringify(formState));
     };
 
     const searchTerm = (event) => {
           event.preventDefault(); // Solo intenta prevenir el comportamiento predeterminado si `event` existe
-          console.log('stext ' + searchText);
           validateSearch();
           handleSearch();
     }
@@ -137,6 +142,7 @@ export const GuessCard = () => {
         }
     }, [selectedValue]);
 
+    
 
     return (
       <>
@@ -152,12 +158,7 @@ export const GuessCard = () => {
                     }}
                     onChange={(event, newValue) => {
                         if (newValue) {
-                            setSelectedValue(newValue);
-                            // onSuggestionClick({ name: newValue });
-                            // setTimeout(() => {
-                            //     onInputChange({ target: { name: 'searchText', value: '' } }); // Limpia el valor después de un ciclo de renderizado
-                            // }, 0);
-                            
+                            setSelectedValue(newValue);                     
                         }
                     }}
                     renderInput={(params) => (
@@ -175,40 +176,7 @@ export const GuessCard = () => {
                         />
                     )}
                 />
-                {/* <button className='btn btn-primary m-2 form-control'>Buscar</button> */}
             </form>
-
-            {/* Dropdown de Sugerencias */}
-            {/* {suggestions.length > 0 && (           
-                    <div className="dropdown">
-                        <button
-                        className="btn btn-secondary dropdown-toggle w-100"
-                        type="button"
-                        id="dropdownMenuButton"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                        >
-                        Sugerencias
-                        </button>
-                        <ul className="dropdown-menu"
-                        aria-labelledby="dropdownMenuButton"
-                        style={{
-                            maxHeight: "200px", // Altura máxima del contenedor
-                            overflowY: "auto",  // Habilita el scroll vertical
-                        }}>
-                        {suggestions.map((suggestion, index) => (
-                            <li className='list-group-item' key={index} >
-                                <button
-                                    className="dropdown-item"
-                                    onClick={() => onSuggestionClick(suggestion)}
-                                >
-                                    {suggestion.name}
-                                </button>
-                            </li>
-                        ))}
-                        </ul>
-                    </div>            
-            )} */}
 
             <ul className='list-group m-2'>
                 {
