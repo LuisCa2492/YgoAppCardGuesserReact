@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {alert, updateScore} from '../helpers';
 import { CardGuess } from '../components/CardGuess';
-import { getRandomCard,searchByCoincidence, setActualScore } from '../../store/slices/yugioh';
+import { getRandomCard,searchByCoincidence, setActualScore,getUserScore,UpdateUserScore,setUserScore } from '../../store/slices/yugioh';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from '../../hooks/useForm';
 import 'animate.css';
@@ -12,6 +12,7 @@ const formData= { searchText: '' };
 
 export const GuessCard = () => {
     const {carta,cartas,actualScore,totalScore,notGuessedNumber} = useSelector( state => state.yugioh);
+    const {uid,email,displayName} = useSelector(state => state.auth);
     const dispatch = useDispatch();
     //Sugerencias
     const [suggestions,setSuggestions] = useState([]);
@@ -26,7 +27,8 @@ export const GuessCard = () => {
         if (inputSearchRef.current) {
             inputSearchRef.current.focus();
         }
-    }, []);
+        dispatch(getUserScore(uid,email,displayName));
+    }, [uid,email,displayName]);
 
     useEffect(()=>{
         if(correctGuess){
@@ -45,11 +47,13 @@ export const GuessCard = () => {
         const result = cartas?.data?.length > 0 ? [...cartas.data] : [];
         setSuggestions(result);
     }, [cartas])
-
+    
     //funcionalidad de puntaje del juego
     // 3 intentos al primer intento 10pts, segundo 5pts, tercero 3 pts
     const setScore = (guessesAmount) => {
-        dispatch(setActualScore(updateScore(guessesAmount)));
+       
+        dispatch(setUserScore(guessesAmount,uid,email,displayName));
+
     }
 
     //fin

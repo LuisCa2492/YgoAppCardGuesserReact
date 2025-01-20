@@ -1,3 +1,4 @@
+
 const calculatePoints = (guessesAmount) => {
     switch (guessesAmount) {
         case 0:
@@ -14,8 +15,5 @@ const calculatePoints = (guessesAmount) => {
 }
 
 export const updateScore = (guessesAmount) => {
-    //actualizar el estado del store
-    //luego llamar al api y actualizar la bd FALTA POR HACER
-    console.log('cp ' + calculatePoints(guessesAmount));
     return calculatePoints(guessesAmount);
 }

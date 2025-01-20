@@ -1,5 +1,6 @@
-import { yugiohApi } from "../../../api/yugiohApi";
-import { setRandomCard, startLoadingCard,searchByPartialName } from "./"
+import { dbScoreApi,yugiohApi } from "../../../api";
+import { updateScore } from "../../../cartasYGO/helpers";
+import { setRandomCard, startLoadingCard,searchByPartialName, setTotalScore,setActualScore } from "./"
 
 export const getRandomCard = () => {
     return async(dispatch,getState) => {
@@ -28,4 +29,70 @@ export const searchByCoincidence = (name = '') => {
         }
         //console.log('sbc ' +resp.data);
     }
+}
+
+export const getUserScore = (uid,email,displayName) => {
+    return async(dispatch,getState) => {
+        
+        try {
+            const userPoints = await dbScoreApi.get(`/UserPoints/GetUserData/${uid}`);
+            const {score} = userPoints.data;
+            if(userPoints.data !== ''){ 
+                console.log('points',userPoints.data);
+                //dispatch(setTotalScore(score));
+                dispatch(setActualScore(score));
+            }else {
+                console.log('no data ' + userPoints.data);
+                //si no  esta guardado el usuario en la api se ingresa
+                const newUserResult = await dbScoreApi.post('/UserPoints/InsertUpdateNewUserPoints',{
+                    Uid: uid,
+                    Email:email,
+                    DisplayName: displayName,
+                    PhotoURL:'',
+                    Score: 0,
+                    StatusAccount: 'ACTIVE'
+                });
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
+export const UpdateUserScore = (uid,email,displayName,score) => {
+    return async(dispatch,getState) => {
+        
+        try {
+           console.log('points',score);
+            //si no  esta guardado el usuario en la api se ingresa
+            const newUserResult = await dbScoreApi.post('/UserPoints/InsertUpdateNewUserPoints',{
+                Uid: uid,
+                Email:email,
+                DisplayName: displayName,
+                PhotoURL:'',
+                Score: score,
+                StatusAccount: 'ACTIVE'
+            });
+
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+}
+
+
+export const setUserScore = (guessesAmount,uid,email,displayName) => {
+    return async(dispatch,getState) => {
+        dispatch((dispatch, getState) => {
+            // Actualizar el puntaje
+            dispatch(setActualScore(updateScore(guessesAmount)));
+    
+            // Obtener el estado actualizado
+            const updatedScore = getState().yugioh.actualScore;
+            // Llamar a la API con el puntaje actualizado
+            dispatch(UpdateUserScore(uid, email, displayName, updatedScore));
+        });
+    }
+       
 }
