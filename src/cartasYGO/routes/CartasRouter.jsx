@@ -3,6 +3,7 @@ import { NavBar } from '../../ui/NavBar'
 import { RandomCard } from '../pages/RandomCard'
 import { SearchByPartialName } from '../pages/SearchByPartialName'
 import { GuessCard } from '../pages/GuessCard'
+import { Leaderboard } from '../components/Leaderboard'
 
 export const CartasRouter = () => {
 
@@ -14,6 +15,7 @@ export const CartasRouter = () => {
             <Route path='/randomCard' element={<RandomCard/>}/>
             <Route path='/searchCoincidence' element={<SearchByPartialName/>}/>
             <Route path='/GuessCard' element={<GuessCard/>}/>
+            <Route path='/LeaderBoard' element={<Leaderboard/>}/>
         </Routes>
     </>
   )

@@ -1,6 +1,6 @@
 import { dbScoreApi,yugiohApi } from "../../../api";
 import { updateScore } from "../../../cartasYGO/helpers";
-import { setRandomCard, startLoadingCard,searchByPartialName, setTotalScore,setActualScore } from "./"
+import { setRandomCard, startLoadingCard,searchByPartialName, setTotalScore,setActualScore, setUsersLeaderBoard } from "./"
 
 export const getRandomCard = () => {
     return async(dispatch,getState) => {
@@ -95,4 +95,15 @@ export const setUserScore = (guessesAmount,uid,email,displayName) => {
         });
     }
        
+}
+
+export const getUsersLeaderBoard = () => {
+    return async(dispatch,getState) => {
+        try {
+            const leaderboardResult = await dbScoreApi.get('/UserPoints/GetData');
+            dispatch(setUsersLeaderBoard(leaderboardResult.data));
+        } catch (error) {
+            throw error;
+        }
+    }
 }

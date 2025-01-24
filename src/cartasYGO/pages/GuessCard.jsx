@@ -175,7 +175,7 @@ export const GuessCard = () => {
                             inputRef={inputSearchRef}
                             onFocus={() => {
                                 // elimino las sugerencias guardadas al dar click al valor de busqueda anterior para que no me devuelva la ultima busqueda
-                                setSuggestions([]);
+                                //setSuggestions([]);
                             }}
                         />
                     )}
