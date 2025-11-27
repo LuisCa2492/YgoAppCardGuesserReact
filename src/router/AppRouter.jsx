@@ -10,23 +10,22 @@ import { NavBar } from '../ui/NavBar'
 export const AppRouter = () => {
 
   const { status } = useCheckAuth();
-  console.log('status '+status)
-  if( status === 'checking'){
+  if (status === 'checking') {
 
-    return <CheckingAuth/>;
-  } 
+    return <CheckingAuth />;
+  }
   return (
     <>
-    
-        <Routes>
-          {
-            (status === 'authenticated') ? <Route path='/*' element={<CartasRouter/>}/>
-            : <Route path='/*' element={<AuthRoutes/>}/>
-          }
-          
-            
-            
-        </Routes>
+
+      <Routes>
+        {
+          (status === 'authenticated') ? <Route path='/*' element={<CartasRouter />} />
+            : <Route path='/*' element={<AuthRoutes />} />
+        }
+
+
+
+      </Routes>
     </>
   )
 }

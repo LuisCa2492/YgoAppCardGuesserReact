@@ -4,23 +4,22 @@ import { getRandomCard } from "../../store/slices/yugioh";
 import { Card } from "../components/Card";
 
 export const RandomCard = () => {
-  
-  const {carta} = useSelector( state => state.yugioh);
-  //console.log(carta);
+
+  const { carta } = useSelector(state => state.yugioh);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getRandomCard());
   }, [])
-  
+
   const SiguienteCarta = () => {
-      dispatch(getRandomCard());
+    dispatch(getRandomCard());
   }
 
 
 
   return (
     <>
-       <Card {...carta} SiguienteCarta={SiguienteCarta}/>
+      <Card {...carta} SiguienteCarta={SiguienteCarta} />
     </>
   )
 }
